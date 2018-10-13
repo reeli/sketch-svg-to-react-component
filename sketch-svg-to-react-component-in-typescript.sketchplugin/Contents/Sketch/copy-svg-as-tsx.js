@@ -592,13 +592,20 @@ __webpack_require__.r(__webpack_exports__);
 
   group.remove(); // 5. read the file to get svg string
 
+  var svgString;
+
   try {
-    var svgString = _skpm_fs__WEBPACK_IMPORTED_MODULE_2___default.a.readFileSync(targetPath);
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["copyStrToClipboard"])(svgString);
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].COPY_TO_CLIPBOARD_SUCCESS);
+    svgString = _skpm_fs__WEBPACK_IMPORTED_MODULE_2___default.a.readFileSync(targetPath);
   } catch (e) {
     Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].READ_FILE_ERROR);
-  }
+  } // 6. simplify svg string
+  // 7. create react component
+
+
+  var result = Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["createWrapper"])(svgString); // 8. copy result to clipboard
+
+  Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["copyStrToClipboard"])(result);
+  Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].COPY_TO_CLIPBOARD_SUCCESS);
 });
 
 /***/ }),
@@ -607,7 +614,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!************************!*\
   !*** ./src/helpers.js ***!
   \************************/
-/*! exports provided: showMessage, getDuplicateSelection, copyStrToClipboard */
+/*! exports provided: showMessage, getDuplicateSelection, copyStrToClipboard, createWrapper */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -615,6 +622,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "showMessage", function() { return showMessage; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getDuplicateSelection", function() { return getDuplicateSelection; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "copyStrToClipboard", function() { return copyStrToClipboard; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createWrapper", function() { return createWrapper; });
 /* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sketch */ "sketch");
 /* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sketch__WEBPACK_IMPORTED_MODULE_0__);
 
@@ -634,6 +642,9 @@ var copyStrToClipboard = function copyStrToClipboard(str) {
   pasteboard.clearContents();
   pasteboard.writeObjects(["".concat(str)]);
   sketch__WEBPACK_IMPORTED_MODULE_0___default.a.UI.message([str]);
+};
+var createWrapper = function createWrapper(svgString) {
+  return "\n    import * as React from \"react\";\n    \n    export const IconSvg:React.SFC = (props) => (\n        ".concat(svgString, "\n    )\n    ");
 };
 
 /***/ }),

@@ -1,7 +1,7 @@
 import sketch from "sketch";
 import os from "@skpm/os";
 import fs from "@skpm/fs";
-import {copyStrToClipboard, getDuplicateSelection, showMessage} from "./helpers";
+import {copyStrToClipboard, createWrapper, getDuplicateSelection, showMessage} from "./helpers";
 import {MESSAGES} from "./messages";
 
 export default function () {
@@ -37,12 +37,19 @@ export default function () {
     group.remove();
 
     // 5. read the file to get svg string
+    let svgString;
     try {
-        const svgString = fs.readFileSync(targetPath);
-        copyStrToClipboard(svgString);
-        showMessage(MESSAGES.COPY_TO_CLIPBOARD_SUCCESS);
+        svgString = fs.readFileSync(targetPath);
     } catch (e) {
         showMessage(MESSAGES.READ_FILE_ERROR);
     }
 
+    // 6. simplify svg string
+
+    // 7. create react component
+    const result = createWrapper(svgString);
+
+    // 8. copy result to clipboard
+    copyStrToClipboard(result);
+    showMessage(MESSAGES.COPY_TO_CLIPBOARD_SUCCESS);
 }

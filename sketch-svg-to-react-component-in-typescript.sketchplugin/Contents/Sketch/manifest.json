@@ -5,7 +5,7 @@
   "commands": [
     {
       "name": "Copy Tsx",
-      "identifier": "my-command-identifier",
+      "identifier": "copy-svg-as-tsx",
       "script": "copy-svg-as-tsx.js",
       "shortcut": "cmd control t"
     }
