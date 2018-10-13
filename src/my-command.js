@@ -1,19 +1,58 @@
-import sketch from 'sketch'
-// documentation: https://developer.sketchapp.com/reference/api/
+import sketch from 'sketch';
+import fs from '@skpm/fs';
+import os from '@skpm/os';
+
+const MESSAGES = {
+    NO_LAYER_SELECTED: "Please select a layer!"
+};
 
 export default function () {
-    // sketch.UI.message("It's alive 🙌")
-    const layer = context.selection.firstObject();
-    const ancestry = MSImmutableLayerAncestry.ancestryWithMSLayer_(layer);
-    const exportRequest = MSExportRequest.exportRequestsFromLayerAncestry_(ancestry).firstObject();
-    exportRequest.format = 'svg';
-    const exporter = MSExporter.exporterForRequest_colorSpace_(exportRequest, NSColorSpace.sRGBColorSpace());
-    const svgData = exporter.data();
-    const svgString = NSString.alloc().initWithData_encoding(svgData, NSUTF8StringEncoding);
-    const pasteboard = NSPasteboard.generalPasteboard();
-    pasteboard.clearContents();
-    pasteboard.writeObjects([svgString]);
+    const document = sketch.Document.getSelectedDocument();
+    const selection = document.selectedLayers;
+    const page = document.selectedPage;
+    const {isEmpty} = selection;
 
-    sketch.UI.message(`${svgString}===========`)
+    if (isEmpty) {
+        sketch.UI.message(MESSAGES.NO_LAYER_SELECTED);
+        return;
+    }
+
+    const newLayers = [];
+    selection.forEach(layer => {
+        const duplicatedLayer = layer.duplicate();
+        newLayers.push(duplicatedLayer);
+    });
+
+    const name = 'react-copy-component';
+
+    const group = new sketch.Group({
+        name,
+        layers: newLayers,
+        parent: page,
+    });
+
+    group.adjustToFit();
+
+    const userHome = os.homedir();
+    const targetFolder = `${userHome}/Documents/Sketch Exports`;
+
+    sketch.export(group, {
+        formats: 'svg',
+        compact: true,
+    });
+
+    group.remove();
+
+    const fileName = `${targetFolder}/${name}.svg`;
+
+    try {
+        const svgString = fs.readFileSync(fileName, {encoding: "utf-8"});
+        const pasteboard = NSPasteboard.generalPasteboard();
+        pasteboard.clearContents();
+        pasteboard.writeObjects([`${svgString}`]);
+        sketch.UI.message(`${svgString}`);
+    } catch (e) {
+        sketch.UI.message("copy failed!");
+    }
 }
 

@@ -21,5 +21,10 @@
   "devDependencies": {
     "@skpm/builder": "^0.5.2"
   },
-  "author": "reeli <reeli.null@gmail.com>"
+  "author": "reeli <reeli.null@gmail.com>",
+  "dependencies": {
+    "@skpm/fs": "^0.2.0",
+    "@skpm/os": "0.1.1",
+    "@skpm/path": "^0.1.1"
+  }
 }
