@@ -1,58 +1,48 @@
-import sketch from 'sketch';
-import fs from '@skpm/fs';
-import os from '@skpm/os';
-
-const MESSAGES = {
-    NO_LAYER_SELECTED: "Please select a layer!"
-};
+import sketch from "sketch";
+import os from "@skpm/os";
+import fs from "@skpm/fs";
+import {copyStrToClipboard, getDuplicateSelection, showMessage} from "./helpers";
+import {MESSAGES} from "./messages";
 
 export default function () {
+    const name = "sketch-selected-svg";
     const document = sketch.Document.getSelectedDocument();
-    const selection = document.selectedLayers;
     const page = document.selectedPage;
-    const {isEmpty} = selection;
 
-    if (isEmpty) {
-        sketch.UI.message(MESSAGES.NO_LAYER_SELECTED);
-        return;
+    // 1. get selected layers
+    const selection = document.selectedLayers;
+    if (selection.isEmpty) {
+        return showMessage(MESSAGES.NO_LAYER_SELECTED);
     }
 
-    const newLayers = [];
-    selection.forEach(layer => {
-        const duplicatedLayer = layer.duplicate();
-        newLayers.push(duplicatedLayer);
-    });
-
-    const name = 'react-copy-component';
-
+    // 2. duplicate selected layers and group them
+    const duplicateSelection = getDuplicateSelection(selection);
     const group = new sketch.Group({
         name,
-        layers: newLayers,
-        parent: page,
+        layers: duplicateSelection,
+        parent: page
     });
 
     group.adjustToFit();
 
-    const userHome = os.homedir();
-    const targetFolder = `${userHome}/Documents/Sketch Exports`;
-
+    // 3. export group to svg file
+    const homeDir = os.homedir();
+    const defaultFolder = "/Documents/Sketch Exports";
+    const targetPath = `${homeDir}${defaultFolder}/${name}.svg`;
     sketch.export(group, {
-        formats: 'svg',
-        compact: true,
+        formats: "svg",
     });
 
+    // 4. should remove the group after we exported it to svg, otherwise it still shows in the sketch file
     group.remove();
 
-    const fileName = `${targetFolder}/${name}.svg`;
-
+    // 5. read the file
     try {
-        const svgString = fs.readFileSync(fileName, {encoding: "utf-8"});
-        const pasteboard = NSPasteboard.generalPasteboard();
-        pasteboard.clearContents();
-        pasteboard.writeObjects([`${svgString}`]);
-        sketch.UI.message(`${svgString}`);
+        const svgString = fs.readFileSync(targetPath);
+        copyStrToClipboard(svgString);
+        showMessage(MESSAGES.COPY_TO_CLIPBOARD_SUCCESS);
     } catch (e) {
-        sketch.UI.message("copy failed!");
+        showMessage(MESSAGES.READ_FILE_ERROR);
     }
-}
 
+}

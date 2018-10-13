@@ -5,7 +5,7 @@ plugin.sketchplugin
 node_modules
 .npm
 npm-debug.log
-*.js.map
+**/*.js.map
 
 # mac
 .DS_Store
