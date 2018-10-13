@@ -4,15 +4,16 @@
   "icon": "icon.png",
   "commands": [
     {
-      "name": "my-command",
+      "name": "Copy Tsx",
       "identifier": "my-command-identifier",
-      "script": "my-command.js"
+      "script": "copy-svg-as-tsx.js",
+      "shortcut": "cmd control t"
     }
   ],
   "menu": {
-    "title": "sketch-svg-to-react-component-in-typescript",
+    "title": "copy-svg-as-tsx",
     "items": [
-      "my-command-identifier"
+      "copy-svg-as-tsx"
     ]
   },
   "version": "0.1.0",

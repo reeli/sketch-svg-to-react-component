@@ -36,7 +36,7 @@ export default function () {
     // 4. should remove the group after we exported it to svg, otherwise it still shows in the sketch file
     group.remove();
 
-    // 5. read the file
+    // 5. read the file to get svg string
     try {
         const svgString = fs.readFileSync(targetPath);
         copyStrToClipboard(svgString);

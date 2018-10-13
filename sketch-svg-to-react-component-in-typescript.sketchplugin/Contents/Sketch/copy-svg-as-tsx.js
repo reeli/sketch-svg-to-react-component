@@ -86,7 +86,7 @@ var exports =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/my-command.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/copy-svg-as-tsx.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -541,6 +541,68 @@ module.exports.userInfo = function () {
 
 /***/ }),
 
+/***/ "./src/copy-svg-as-tsx.js":
+/*!********************************!*\
+  !*** ./src/copy-svg-as-tsx.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sketch */ "sketch");
+/* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sketch__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _skpm_os__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @skpm/os */ "./node_modules/@skpm/os/index.js");
+/* harmony import */ var _skpm_os__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_skpm_os__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _skpm_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @skpm/fs */ "./node_modules/@skpm/fs/index.js");
+/* harmony import */ var _skpm_fs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_skpm_fs__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers */ "./src/helpers.js");
+/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./messages */ "./src/messages.js");
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function () {
+  var name = "sketch-selected-svg";
+  var document = sketch__WEBPACK_IMPORTED_MODULE_0___default.a.Document.getSelectedDocument();
+  var page = document.selectedPage; // 1. get selected layers
+
+  var selection = document.selectedLayers;
+
+  if (selection.isEmpty) {
+    return Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].NO_LAYER_SELECTED);
+  } // 2. duplicate selected layers and group them
+
+
+  var duplicateSelection = Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["getDuplicateSelection"])(selection);
+  var group = new sketch__WEBPACK_IMPORTED_MODULE_0___default.a.Group({
+    name: name,
+    layers: duplicateSelection,
+    parent: page
+  });
+  group.adjustToFit(); // 3. export group to svg file
+
+  var homeDir = _skpm_os__WEBPACK_IMPORTED_MODULE_1___default.a.homedir();
+  var defaultFolder = "/Documents/Sketch Exports";
+  var targetPath = "".concat(homeDir).concat(defaultFolder, "/").concat(name, ".svg");
+  sketch__WEBPACK_IMPORTED_MODULE_0___default.a.export(group, {
+    formats: "svg"
+  }); // 4. should remove the group after we exported it to svg, otherwise it still shows in the sketch file
+
+  group.remove(); // 5. read the file to get svg string
+
+  try {
+    var svgString = _skpm_fs__WEBPACK_IMPORTED_MODULE_2___default.a.readFileSync(targetPath);
+    Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["copyStrToClipboard"])(svgString);
+    Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].COPY_TO_CLIPBOARD_SUCCESS);
+  } catch (e) {
+    Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].READ_FILE_ERROR);
+  }
+});
+
+/***/ }),
+
 /***/ "./src/helpers.js":
 /*!************************!*\
   !*** ./src/helpers.js ***!
@@ -594,68 +656,6 @@ var MESSAGES = {
 
 /***/ }),
 
-/***/ "./src/my-command.js":
-/*!***************************!*\
-  !*** ./src/my-command.js ***!
-  \***************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sketch */ "sketch");
-/* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sketch__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _skpm_os__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @skpm/os */ "./node_modules/@skpm/os/index.js");
-/* harmony import */ var _skpm_os__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_skpm_os__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _skpm_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @skpm/fs */ "./node_modules/@skpm/fs/index.js");
-/* harmony import */ var _skpm_fs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_skpm_fs__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers */ "./src/helpers.js");
-/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./messages */ "./src/messages.js");
-
-
-
-
-
-/* harmony default export */ __webpack_exports__["default"] = (function () {
-  var name = "sketch-selected-svg";
-  var document = sketch__WEBPACK_IMPORTED_MODULE_0___default.a.Document.getSelectedDocument();
-  var page = document.selectedPage; // 1. get selected layers
-
-  var selection = document.selectedLayers;
-
-  if (selection.isEmpty) {
-    return Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].NO_LAYER_SELECTED);
-  } // 2. duplicate selected layers and group them
-
-
-  var duplicateSelection = Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["getDuplicateSelection"])(selection);
-  var group = new sketch__WEBPACK_IMPORTED_MODULE_0___default.a.Group({
-    name: name,
-    layers: duplicateSelection,
-    parent: page
-  });
-  group.adjustToFit(); // 3. export group to svg file
-
-  var homeDir = _skpm_os__WEBPACK_IMPORTED_MODULE_1___default.a.homedir();
-  var defaultFolder = "/Documents/Sketch Exports";
-  var targetPath = "".concat(homeDir).concat(defaultFolder, "/").concat(name, ".svg");
-  sketch__WEBPACK_IMPORTED_MODULE_0___default.a.export(group, {
-    formats: "svg"
-  }); // 4. should remove the group after we exported it to svg, otherwise it still shows in the sketch file
-
-  group.remove(); // 5. read the file
-
-  try {
-    var svgString = _skpm_fs__WEBPACK_IMPORTED_MODULE_2___default.a.readFileSync(targetPath);
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["copyStrToClipboard"])(svgString);
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].COPY_TO_CLIPBOARD_SUCCESS);
-  } catch (e) {
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].READ_FILE_ERROR);
-  }
-});
-
-/***/ }),
-
 /***/ "buffer":
 /*!*************************!*\
   !*** external "buffer" ***!
@@ -687,4 +687,4 @@ module.exports = require("sketch");
 }
 that['onRun'] = __skpm_run.bind(this, 'default')
 
-//# sourceMappingURL=my-command.js.map
+//# sourceMappingURL=copy-svg-as-tsx.js.map
