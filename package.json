@@ -1,13 +1,13 @@
 {
-  "name": "sketch-svg-to-react-component-in-typescript",
+  "name": "sketch-svg-to-react-component",
   "version": "0.1.0",
   "engines": {
     "sketch": ">=3.0"
   },
   "skpm": {
-    "name": "sketch-svg-to-react-component-in-typescript",
+    "name": "sketch-svg-to-react-component",
     "manifest": "src/manifest.json",
-    "main": "sketch-svg-to-react-component-in-typescript.sketchplugin",
+    "main": "sketch-svg-to-react-component.sketchplugin",
     "assets": [
       "assets/**/*"
     ]

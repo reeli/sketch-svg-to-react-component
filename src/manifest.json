@@ -17,7 +17,7 @@
     }
   ],
   "menu": {
-    "title": "copy-svg-as-tsx",
+    "title": "sketch-svg-to-react-component",
     "items": [
       "copy-svg-as-tsx",
       "copy-svg-as-rn-component"
