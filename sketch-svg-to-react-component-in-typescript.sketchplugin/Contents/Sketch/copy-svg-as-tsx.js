@@ -1127,286 +1127,6 @@ module.exports = EventEmitter
 
 /***/ }),
 
-/***/ "./node_modules/@skpm/fs/index.js":
-/*!****************************************!*\
-  !*** ./node_modules/@skpm/fs/index.js ***!
-  \****************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-// TODO: async. Should probably be done with NSFileHandle and some notifications
-// TODO: file descriptor. Needs to be done with NSFileHandle
-var Buffer = __webpack_require__(/*! buffer */ "buffer").Buffer
-
-function encodingFromOptions(options, defaultValue) {
-  return options && options.encoding
-    ? String(options.encoding)
-    : (
-      options
-        ? String(options)
-        : defaultValue
-    )
-}
-
-module.exports.constants = {
-  F_OK: 0,
-  R_OK: 4,
-  W_OK: 2,
-  X_OK: 1
-}
-
-module.exports.accessSync = function(path, mode) {
-  mode = mode | 0
-  var fileManager = NSFileManager.defaultManager()
-
-  switch (mode) {
-    case 0:
-      return module.exports.existsSync(path)
-    case 1:
-      return Boolean(fileManager.isExecutableFileAtPath(path))
-    case 2:
-      return Boolean(fileManager.isWritableFileAtPath(path))
-    case 3:
-      return Boolean(fileManager.isExecutableFileAtPath(path) && fileManager.isWritableFileAtPath(path))
-    case 4:
-      return Boolean(fileManager.isReadableFileAtPath(path))
-    case 5:
-      return Boolean(fileManager.isReadableFileAtPath(path) && fileManager.isExecutableFileAtPath(path))
-    case 6:
-      return Boolean(fileManager.isReadableFileAtPath(path) && fileManager.isWritableFileAtPath(path))
-    case 7:
-      return Boolean(fileManager.isReadableFileAtPath(path) && fileManager.isWritableFileAtPath(path) && fileManager.isExecutableFileAtPath(path))
-  }
-}
-
-module.exports.appendFileSync = function(file, data, options) {
-  if (!module.exports.existsSync(file)) {
-    return module.exports.writeFileSync(file, data, options)
-  }
-
-  var handle = NSFileHandle.fileHandleForWritingAtPath(file)
-  handle.seekToEndOfFile()
-
-  var encoding = encodingFromOptions(options, 'utf8')
-
-  var nsdata = Buffer.from(data, encoding === 'NSData' || encoding === 'buffer' ? undefined : encoding).toNSData()
-
-  handle.writeData(nsdata)
-}
-
-module.exports.chmodSync = function(path, mode) {
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  fileManager.setAttributes_ofItemAtPath_error({
-    NSFilePosixPermissions: mode
-  }, path, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-}
-
-module.exports.copyFileSync = function(path, dest, flags) {
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  fileManager.copyItemAtPath_toPath_error(path, dest, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-}
-
-module.exports.existsSync = function(path) {
-  var fileManager = NSFileManager.defaultManager()
-  return Boolean(fileManager.fileExistsAtPath(path))
-}
-
-module.exports.linkSync = function(existingPath, newPath) {
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  fileManager.linkItemAtPath_toPath_error(existingPath, newPath, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-}
-
-module.exports.mkdirSync = function(path, mode) {
-  mode = mode || 0o777
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(path, false, {
-    NSFilePosixPermissions: mode
-  }, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-}
-
-module.exports.mkdtempSync = function(path) {
-  function makeid() {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for (var i = 0; i < 6; i++)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-  }
-  var tempPath = path + makeid()
-  module.exports.mkdirSync(tempPath)
-  return tempPath
-}
-
-module.exports.readdirSync = function(path) {
-  var fileManager = NSFileManager.defaultManager()
-  var paths = fileManager.subpathsAtPath(path)
-  var arr = []
-  for (var i = 0; i < paths.length; i++) {
-    arr.push(String(paths[i]))
-  }
-  return arr
-}
-
-module.exports.readFileSync = function(path, options) {
-  var encoding = encodingFromOptions(options, 'buffer')
-  var fileManager = NSFileManager.defaultManager()
-  var data = fileManager.contentsAtPath(path)
-  var buffer = Buffer.from(data)
-
-  if (encoding === 'buffer') {
-    return buffer
-  } else if (encoding === 'NSData') {
-    return buffer.toNSData()
-  } else {
-    return buffer.toString(encoding)
-  }
-}
-
-module.exports.readlinkSync = function(path) {
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  var result = fileManager.destinationOfSymbolicLinkAtPath_error(path, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-
-  return String(result)
-}
-
-module.exports.realpathSync = function(path) {
-  return String(NSString.stringByResolvingSymlinksInPath(path))
-}
-
-module.exports.renameSync = function(oldPath, newPath) {
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  fileManager.moveItemAtPath_toPath_error(oldPath, newPath, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-}
-
-module.exports.rmdirSync = function(path) {
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  fileManager.removeItemAtPath_error(path, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-}
-
-module.exports.statSync = function(path) {
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  var result = fileManager.attributesOfItemAtPath_error(path, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-
-  return {
-    dev: String(result.NSFileDeviceIdentifier),
-    // ino: 48064969, The file system specific "Inode" number for the file.
-    mode: result.NSFileType | result.NSFilePosixPermissions,
-    nlink: Number(result.NSFileReferenceCount),
-    uid: String(result.NSFileOwnerAccountID),
-    gid: String(result.NSFileGroupOwnerAccountID),
-    // rdev: 0, A numeric device identifier if the file is considered "special".
-    size: Number(result.NSFileSize),
-    // blksize: 4096, The file system block size for i/o operations.
-    // blocks: 8, The number of blocks allocated for this file.
-    atimeMs: Number(result.NSFileModificationDate.timeIntervalSince1970()) * 1000,
-    mtimeMs: Number(result.NSFileModificationDate.timeIntervalSince1970()) * 1000,
-    ctimeMs: Number(result.NSFileModificationDate.timeIntervalSince1970()) * 1000,
-    birthtimeMs: Number(result.NSFileCreationDate.timeIntervalSince1970()) * 1000,
-    atime: new Date(Number(result.NSFileModificationDate.timeIntervalSince1970()) * 1000 + 0.5), // the 0.5 comes from the node source. Not sure why it's added but in doubt...
-    mtime: new Date(Number(result.NSFileModificationDate.timeIntervalSince1970()) * 1000 + 0.5),
-    ctime: new Date(Number(result.NSFileModificationDate.timeIntervalSince1970()) * 1000 + 0.5),
-    birthtime: new Date(Number(result.NSFileCreationDate.timeIntervalSince1970()) * 1000 + 0.5),
-    isBlockDevice: function() { return result.NSFileType === NSFileTypeBlockSpecial },
-    isCharacterDevice: function() { return result.NSFileType === NSFileTypeCharacterSpecial },
-    isDirectory: function() { return result.NSFileType === NSFileTypeDirectory },
-    isFIFO: function() { return false },
-    isFile: function() { return result.NSFileType === NSFileTypeRegular },
-    isSocket: function() { return result.NSFileType === NSFileTypeSocket },
-    isSymbolicLink: function() { return result.NSFileType === NSFileTypeSymbolicLink },
-  }
-}
-
-module.exports.symlinkSync = function(target, path) {
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  var result = fileManager.createSymbolicLinkAtPath_withDestinationPath_error(path, target, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-}
-
-module.exports.truncateSync = function(path, len) {
-  var hFile = NSFileHandle.fileHandleForUpdatingAtPath(sFilePath)
-  hFile.truncateFileAtOffset(len || 0)
-  hFile.closeFile()
-}
-
-module.exports.unlinkSync = function(path) {
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  var result = fileManager.removeItemAtPath_error(path, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-}
-
-module.exports.utimesSync = function(path, aTime, mTime) {
-  var err = MOPointer.alloc().init()
-  var fileManager = NSFileManager.defaultManager()
-  var result = fileManager.setAttributes_ofItemAtPath_error({
-    NSFileModificationDate: aTime
-  }, path, err)
-
-  if (err.value() !== null) {
-    throw new Error(err.value())
-  }
-}
-
-module.exports.writeFileSync = function(path, data, options) {
-  var encoding = encodingFromOptions(options, 'utf8')
-
-  var nsdata = Buffer.from(data, encoding === 'NSData' || encoding === 'buffer' ? undefined : encoding).toNSData()
-
-  nsdata.writeToFile_atomically(path, true)
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/@skpm/os/index.js":
 /*!****************************************!*\
   !*** ./node_modules/@skpm/os/index.js ***!
@@ -1862,11 +1582,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sketch__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _skpm_os__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @skpm/os */ "./node_modules/@skpm/os/index.js");
 /* harmony import */ var _skpm_os__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_skpm_os__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _skpm_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @skpm/fs */ "./node_modules/@skpm/fs/index.js");
-/* harmony import */ var _skpm_fs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_skpm_fs__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers */ "./src/helpers.js");
-/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./messages */ "./src/messages.js");
-
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers */ "./src/helpers.js");
+/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./messages */ "./src/messages.js");
 
 
 
@@ -1875,8 +1592,8 @@ __webpack_require__.r(__webpack_exports__);
 var _require = __webpack_require__(/*! @skpm/child_process */ "./node_modules/@skpm/child_process/index.js"),
     execSync = _require.execSync;
 
-function optimizeFilesWithSVGO(svgPath, svgoPath) {
-  return execSync("".concat(svgoPath, " --pretty --disable=convertShapeToPath --enable=removeTitle ") + '--enable=removeDesc --enable=removeDoctype --enable=removeEmptyAttrs ' + '--enable=removeUnknownsAndDefaults --enable=removeUnusedNS --enable=removeEditorsNSData ' + "\"".concat(svgPath, "\""));
+function optimizeFilesWithSVGO(svgPath, svgrPath) {
+  return execSync("".concat(svgrPath, " \"").concat(svgPath, "\""));
 }
 
 function playSystemSound(sound) {
@@ -1893,11 +1610,11 @@ function playSystemSound(sound) {
   var selection = document.selectedLayers;
 
   if (selection.isEmpty) {
-    return Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].NO_LAYER_SELECTED);
+    return Object(_helpers__WEBPACK_IMPORTED_MODULE_2__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_3__["MESSAGES"].NO_LAYER_SELECTED);
   } // 2. duplicate selected layers and group them
 
 
-  var duplicateSelection = Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["getDuplicateSelection"])(selection);
+  var duplicateSelection = Object(_helpers__WEBPACK_IMPORTED_MODULE_2__["getDuplicateSelection"])(selection);
   var group = new sketch__WEBPACK_IMPORTED_MODULE_0___default.a.Group({
     name: name,
     layers: duplicateSelection,
@@ -1914,26 +1631,22 @@ function playSystemSound(sound) {
   }); // 4. should remove the group after we exported it to svg, otherwise it still shows in the sketch file
 
   group.remove(); // 5. read the file to get svg string
-
-  var svgString;
+  // let svgString;
 
   try {
-    var svgoPath = context.plugin.urlForResourceNamed('node_modules/svgo/bin/svgo').path();
-    var success = optimizeFilesWithSVGO(targetDesc, svgoPath);
-    var resultDesc = success ? 'Compressed' : 'Something went wrong compressing';
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])("".concat(resultDesc, " ").concat(targetDesc));
-    playSystemSound(success ? 'Glass' : 'Basso');
-    svgString = _skpm_fs__WEBPACK_IMPORTED_MODULE_2___default.a.readFileSync(targetDesc);
+    var svgrPath = context.plugin.urlForResourceNamed('node_modules/@svgr/cli/bin/svgr').path();
+    var success = optimizeFilesWithSVGO(targetDesc, svgrPath); // playSystemSound(success ? 'Glass' : 'Basso');
+    // svgString = fs.readFileSync(targetDesc);
+    // 6. simplify svg string
+    // 7. create react component
+    // const result = createWrapper(svgString);
+    // 8. copy result to clipboard
+
+    Object(_helpers__WEBPACK_IMPORTED_MODULE_2__["copyStrToClipboard"])(success);
+    Object(_helpers__WEBPACK_IMPORTED_MODULE_2__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_3__["MESSAGES"].COPY_TO_CLIPBOARD_SUCCESS);
   } catch (e) {
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].READ_FILE_ERROR);
-  } // 6. simplify svg string
-  // 7. create react component
-
-
-  var result = Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["createWrapper"])(svgString); // 8. copy result to clipboard
-
-  Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["copyStrToClipboard"])(result);
-  Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_4__["MESSAGES"].COPY_TO_CLIPBOARD_SUCCESS);
+    Object(_helpers__WEBPACK_IMPORTED_MODULE_2__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_3__["MESSAGES"].READ_FILE_ERROR);
+  }
 });
 
 /***/ }),
@@ -1992,17 +1705,6 @@ var MESSAGES = {
   READ_FILE_ERROR: "Read svg file failed, please check if you have a svg file under you ~/Documents/Sketch Exports!",
   COPY_TO_CLIPBOARD_SUCCESS: "Svg has copied successfully to you clipboard!"
 };
-
-/***/ }),
-
-/***/ "buffer":
-/*!*************************!*\
-  !*** external "buffer" ***!
-  \*************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("buffer");
 
 /***/ }),
 
