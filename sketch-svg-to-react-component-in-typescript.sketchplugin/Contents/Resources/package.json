@@ -1,0 +1,6 @@
+{
+  "name": "sketch-svg-to-react-component-in-typescript-assets",
+  "dependencies": {
+    "svgo": "^1.0.4"
+  }
+}

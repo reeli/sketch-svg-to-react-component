@@ -4,7 +4,24 @@ import fs from "@skpm/fs";
 import {copyStrToClipboard, createWrapper, getDuplicateSelection, showMessage} from "./helpers";
 import {MESSAGES} from "./messages";
 
-export default function () {
+const {execSync} = require('@skpm/child_process');
+
+function optimizeFilesWithSVGO(svgPath, svgoPath) {
+    return execSync(
+        `${svgoPath} --pretty --disable=convertShapeToPath --enable=removeTitle ` +
+        '--enable=removeDesc --enable=removeDoctype --enable=removeEmptyAttrs ' +
+        '--enable=removeUnknownsAndDefaults --enable=removeUnusedNS --enable=removeEditorsNSData ' +
+        `"${svgPath}"`
+    )
+}
+
+function playSystemSound(sound) {
+    // The command line tool `afplay` does what we need - we just have to call it with the full path
+    // of a system sound.
+    return execSync(`/usr/bin/afplay /System/Library/Sounds/${sound}.aiff`)
+}
+
+export default function (context) {
     const name = "sketch-selected-svg";
     const document = sketch.Document.getSelectedDocument();
     const page = document.selectedPage;
@@ -27,10 +44,11 @@ export default function () {
 
     // 3. export group to svg file
     const homeDir = os.homedir();
-    const defaultFolder = "/Documents/Sketch Exports";
-    const targetPath = `${homeDir}${defaultFolder}/${name}.svg`;
+    const targetPath = "/Documents/SketchExports";
+    const targetDesc = `${homeDir}${targetPath}/${name}.svg`;
     sketch.export(group, {
         formats: "svg",
+        output: `~/Documents/SketchExports`
     });
 
     // 4. should remove the group after we exported it to svg, otherwise it still shows in the sketch file
@@ -39,7 +57,16 @@ export default function () {
     // 5. read the file to get svg string
     let svgString;
     try {
-        svgString = fs.readFileSync(targetPath);
+        const svgoPath = context.plugin
+            .urlForResourceNamed('node_modules/svgo/bin/svgo')
+            .path();
+
+        const success = optimizeFilesWithSVGO(targetDesc, svgoPath);
+        const resultDesc = success ? 'Compressed' : 'Something went wrong compressing';
+        showMessage(`${resultDesc} ${targetDesc}`);
+        playSystemSound(success ? 'Glass' : 'Basso')
+        svgString = fs.readFileSync(targetDesc);
+
     } catch (e) {
         showMessage(MESSAGES.READ_FILE_ERROR);
     }

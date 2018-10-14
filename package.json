@@ -16,7 +16,7 @@
     "build": "skpm-build",
     "watch": "skpm-build --watch",
     "start": "skpm-build --watch --run",
-    "postinstall": "npm run build && skpm-link"
+    "postinstall": "cd assets && npm i && cd .. && npm run build && skpm-link"
   },
   "devDependencies": {
     "@skpm/builder": "^0.5.2"
@@ -25,6 +25,8 @@
   "dependencies": {
     "@skpm/fs": "^0.2.0",
     "@skpm/os": "0.1.1",
-    "@skpm/path": "^0.1.1"
+    "@skpm/path": "^0.1.1",
+    "@skpm/child_process": "^0.2.3",
+    "sketch-utils": "^0.1.2"
   }
 }
