@@ -1678,8 +1678,8 @@ function transformSvgToReactComponent(svgPath, svgrPath) {
 function transformSvgToRNComponent(svgPath, svgrPath) {
   return execSync("".concat(svgrPath, " --native \"").concat(svgPath, "\""));
 }
-function transformSvgsToReactComponent(svgPaths, svgrPath, dirname) {
-  return execSync("".concat(svgrPath, " --ext=tsx --out-dir=").concat(dirname) + " " + "\"".concat(svgPaths.join('" "'), "\""));
+function transformSvgsToReactComponent(svgPaths, svgrPath, targetDesc) {
+  return execSync("".concat(svgrPath, " --ext=tsx --out-dir=").concat(targetDesc) + " " + "\"".concat(svgPaths.join('" "'), "\""));
 }
 var getSvgrPathByContext = function getSvgrPathByContext(context) {
   return context.plugin.urlForResourceNamed('node_modules/@svgr/cli/bin/svgr').path();
@@ -1744,7 +1744,8 @@ var MESSAGES = {
   COPY_TO_CLIPBOARD_FAILED: "Copy svg to clipboard failed!",
   COMPRESSING: "Compressing...",
   EXPORT_SUCCESS: "Export successfully!",
-  EXPORT_FAILED: "Export failed!"
+  EXPORT_FAILED: "Export failed!",
+  NO_SVG_EXPORTED: "No svg exported!"
 };
 
 /***/ }),

@@ -43,8 +43,8 @@ export function transformSvgToRNComponent(svgPath, svgrPath) {
     return execSync(`${svgrPath} --native "${svgPath}"`);
 }
 
-export function transformSvgsToReactComponent(svgPaths, svgrPath, dirname) {
-    return execSync(`${svgrPath} --ext=tsx --out-dir=${dirname}` + " " + `"${svgPaths.join('" "')}"`);
+export function transformSvgsToReactComponent(svgPaths, svgrPath, targetDesc) {
+    return execSync(`${svgrPath} --ext=tsx --out-dir=${targetDesc}` + " " + `"${svgPaths.join('" "')}"`);
 }
 
 export const getSvgrPathByContext = (context) => {

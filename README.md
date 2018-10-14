@@ -16,3 +16,5 @@ Todo:
 
 - format copied string by prettier
 - reduce packages size by using like sketch/dom sketch/UI
+- remove specific characters in filename like @2x, otherwise will cause error
+- export simplify svgs

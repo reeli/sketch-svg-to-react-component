@@ -2165,18 +2165,24 @@ module.exports = function toArray(object) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onExportSlices", function() { return onExportSlices; });
 /* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./helpers */ "./src/helpers.js");
-/* harmony import */ var _skpm_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @skpm/path */ "./node_modules/@skpm/path/index.js");
-/* harmony import */ var _skpm_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_skpm_path__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./messages */ "./src/messages.js");
+/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./messages */ "./src/messages.js");
+/* harmony import */ var _skpm_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @skpm/path */ "./node_modules/@skpm/path/index.js");
+/* harmony import */ var _skpm_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_skpm_path__WEBPACK_IMPORTED_MODULE_2__);
 
 
 
 function onExportSlices(context) {
   var svgPaths = Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["getExportedSvgPathsByContext"])(context);
-  var dirname = _skpm_path__WEBPACK_IMPORTED_MODULE_1___default.a.dirname(svgPaths[0]);
-  Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_2__["MESSAGES"].COMPRESSING);
+
+  if (svgPaths.length === 0) {
+    return Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].NO_SVG_EXPORTED);
+  }
+
+  var dirname = _skpm_path__WEBPACK_IMPORTED_MODULE_2___default.a.dirname(svgPaths[0]);
+  log("".concat(Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["getSvgrPathByContext"])(context), " --ext=tsx --out-dir=").concat(dirname) + " " + "\"".concat(svgPaths.join('" "'), "\""));
+  Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].COMPRESSING);
   var result = Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["transformSvgsToReactComponent"])(svgPaths, Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["getSvgrPathByContext"])(context), dirname);
-  result ? Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_2__["MESSAGES"].EXPORT_SUCCESS) : Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_2__["MESSAGES"].EXPORT_FAILED);
+  result ? Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].EXPORT_SUCCESS) : Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].EXPORT_FAILED);
 }
 
 /***/ }),
@@ -2240,8 +2246,8 @@ function transformSvgToReactComponent(svgPath, svgrPath) {
 function transformSvgToRNComponent(svgPath, svgrPath) {
   return execSync("".concat(svgrPath, " --native \"").concat(svgPath, "\""));
 }
-function transformSvgsToReactComponent(svgPaths, svgrPath, dirname) {
-  return execSync("".concat(svgrPath, " --ext=tsx --out-dir=").concat(dirname) + " " + "\"".concat(svgPaths.join('" "'), "\""));
+function transformSvgsToReactComponent(svgPaths, svgrPath, targetDesc) {
+  return execSync("".concat(svgrPath, " --ext=tsx --out-dir=").concat(targetDesc) + " " + "\"".concat(svgPaths.join('" "'), "\""));
 }
 var getSvgrPathByContext = function getSvgrPathByContext(context) {
   return context.plugin.urlForResourceNamed('node_modules/@svgr/cli/bin/svgr').path();
@@ -2306,7 +2312,8 @@ var MESSAGES = {
   COPY_TO_CLIPBOARD_FAILED: "Copy svg to clipboard failed!",
   COMPRESSING: "Compressing...",
   EXPORT_SUCCESS: "Export successfully!",
-  EXPORT_FAILED: "Export failed!"
+  EXPORT_FAILED: "Export failed!",
+  NO_SVG_EXPORTED: "No svg exported!"
 };
 
 /***/ }),
