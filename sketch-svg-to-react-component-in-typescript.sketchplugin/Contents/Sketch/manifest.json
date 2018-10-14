@@ -4,16 +4,23 @@
   "icon": "icon.png",
   "commands": [
     {
-      "name": "Copy Tsx",
+      "name": "Copy React Component",
       "identifier": "copy-svg-as-tsx",
-      "script": "copy-svg-as-tsx.js",
-      "shortcut": "cmd control t"
+      "script": "copy-svg-as-react-component.js",
+      "shortcut": "cmd control r"
+    },
+    {
+      "name": "Copy RN Component",
+      "identifier": "copy-svg-as-rn-component",
+      "script": "copy-svg-as-rn-component.js",
+      "shortcut": "cmd control n"
     }
   ],
   "menu": {
     "title": "copy-svg-as-tsx",
     "items": [
-      "copy-svg-as-tsx"
+      "copy-svg-as-tsx",
+      "copy-svg-as-rn-component"
     ]
   },
   "version": "0.1.0",

@@ -86,7 +86,7 @@ var exports =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/copy-svg-as-tsx.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/copy-svg-as-rn-component.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -1569,83 +1569,30 @@ addStructToBridgeSupport('objc_super', { type: objc_super_typeEncoding });
 
 /***/ }),
 
-/***/ "./src/copy-svg-as-tsx.js":
-/*!********************************!*\
-  !*** ./src/copy-svg-as-tsx.js ***!
-  \********************************/
+/***/ "./src/copy-svg-as-rn-component.js":
+/*!*****************************************!*\
+  !*** ./src/copy-svg-as-rn-component.js ***!
+  \*****************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sketch */ "sketch");
-/* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sketch__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _skpm_os__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @skpm/os */ "./node_modules/@skpm/os/index.js");
-/* harmony import */ var _skpm_os__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_skpm_os__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers */ "./src/helpers.js");
-/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./messages */ "./src/messages.js");
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./helpers */ "./src/helpers.js");
+/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./messages */ "./src/messages.js");
 
-
-
-
-
-var _require = __webpack_require__(/*! @skpm/child_process */ "./node_modules/@skpm/child_process/index.js"),
-    execSync = _require.execSync;
-
-function optimizeFilesWithSVGO(svgPath, svgrPath) {
-  return execSync("".concat(svgrPath, " \"").concat(svgPath, "\""));
-}
-
-function playSystemSound(sound) {
-  // The command line tool `afplay` does what we need - we just have to call it with the full path
-  // of a system sound.
-  return execSync("/usr/bin/afplay /System/Library/Sounds/".concat(sound, ".aiff"));
-}
 
 /* harmony default export */ __webpack_exports__["default"] = (function (context) {
-  var name = "sketch-selected-svg";
-  var document = sketch__WEBPACK_IMPORTED_MODULE_0___default.a.Document.getSelectedDocument();
-  var page = document.selectedPage; // 1. get selected layers
-
-  var selection = document.selectedLayers;
-
-  if (selection.isEmpty) {
-    return Object(_helpers__WEBPACK_IMPORTED_MODULE_2__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_3__["MESSAGES"].NO_LAYER_SELECTED);
-  } // 2. duplicate selected layers and group them
-
-
-  var duplicateSelection = Object(_helpers__WEBPACK_IMPORTED_MODULE_2__["getDuplicateSelection"])(selection);
-  var group = new sketch__WEBPACK_IMPORTED_MODULE_0___default.a.Group({
-    name: name,
-    layers: duplicateSelection,
-    parent: page
-  });
-  group.adjustToFit(); // 3. export group to svg file
-
-  var homeDir = _skpm_os__WEBPACK_IMPORTED_MODULE_1___default.a.homedir();
-  var targetPath = "/Documents/SketchExports";
-  var targetDesc = "".concat(homeDir).concat(targetPath, "/").concat(name, ".svg");
-  sketch__WEBPACK_IMPORTED_MODULE_0___default.a.export(group, {
-    formats: "svg",
-    output: "~/Documents/SketchExports"
-  }); // 4. should remove the group after we exported it to svg, otherwise it still shows in the sketch file
-
-  group.remove(); // 5. read the file to get svg string
-  // let svgString;
-
   try {
-    var svgrPath = context.plugin.urlForResourceNamed('node_modules/@svgr/cli/bin/svgr').path();
-    var success = optimizeFilesWithSVGO(targetDesc, svgrPath); // playSystemSound(success ? 'Glass' : 'Basso');
-    // svgString = fs.readFileSync(targetDesc);
-    // 6. simplify svg string
-    // 7. create react component
-    // const result = createWrapper(svgString);
-    // 8. copy result to clipboard
+    // export selected layers as svg
+    var targetDesc = Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["exportSelectedLayersAsSvg"])();
+    Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].COMPRESSING);
+    var result = Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["transformSvgToRNComponent"])(targetDesc, Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["getSvgrPathByContext"])(context)); // copy result to clipboard
 
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_2__["copyStrToClipboard"])(success);
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_2__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_3__["MESSAGES"].COPY_TO_CLIPBOARD_SUCCESS);
+    Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["copyStrToClipboard"])(result);
+    result ? Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].COPY_TO_CLIPBOARD_SUCCESS) : Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].COPY_TO_CLIPBOARD_FAILED);
   } catch (e) {
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_2__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_3__["MESSAGES"].READ_FILE_ERROR);
+    Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].GENERAL_ERROR);
   }
 });
 
@@ -1655,7 +1602,7 @@ function playSystemSound(sound) {
 /*!************************!*\
   !*** ./src/helpers.js ***!
   \************************/
-/*! exports provided: showMessage, getDuplicateSelection, copyStrToClipboard, createWrapper */
+/*! exports provided: showMessage, getDuplicateSelection, copyStrToClipboard, createWrapper, transformSvgToReactComponent, transformSvgToRNComponent, getSvgrPathByContext, exportSelectedLayersAsSvg */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1664,8 +1611,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getDuplicateSelection", function() { return getDuplicateSelection; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "copyStrToClipboard", function() { return copyStrToClipboard; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createWrapper", function() { return createWrapper; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transformSvgToReactComponent", function() { return transformSvgToReactComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transformSvgToRNComponent", function() { return transformSvgToRNComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getSvgrPathByContext", function() { return getSvgrPathByContext; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "exportSelectedLayersAsSvg", function() { return exportSelectedLayersAsSvg; });
 /* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sketch */ "sketch");
 /* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sketch__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./messages */ "./src/messages.js");
+/* harmony import */ var _skpm_os__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @skpm/os */ "./node_modules/@skpm/os/index.js");
+/* harmony import */ var _skpm_os__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_skpm_os__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+
+var _require = __webpack_require__(/*! @skpm/child_process */ "./node_modules/@skpm/child_process/index.js"),
+    execSync = _require.execSync;
 
 var showMessage = function showMessage(str) {
   sketch__WEBPACK_IMPORTED_MODULE_0___default.a.UI.message(str);
@@ -1687,6 +1647,46 @@ var copyStrToClipboard = function copyStrToClipboard(str) {
 var createWrapper = function createWrapper(svgString) {
   return "\n    import * as React from \"react\";\n    \n    export const IconSvg:React.SFC = (props) => (\n        ".concat(svgString, "\n    )\n    ");
 };
+function transformSvgToReactComponent(svgPath, svgrPath) {
+  return execSync("".concat(svgrPath, " \"").concat(svgPath, "\""));
+}
+function transformSvgToRNComponent(svgPath, svgrPath) {
+  return execSync("".concat(svgrPath, " --native \"").concat(svgPath, "\""));
+}
+var getSvgrPathByContext = function getSvgrPathByContext(context) {
+  return context.plugin.urlForResourceNamed('node_modules/@svgr/cli/bin/svgr').path();
+};
+var exportSelectedLayersAsSvg = function exportSelectedLayersAsSvg() {
+  var name = "sketch-selected-svg";
+  var document = sketch__WEBPACK_IMPORTED_MODULE_0___default.a.Document.getSelectedDocument();
+  var page = document.selectedPage; // get selected layers
+
+  var selection = document.selectedLayers;
+
+  if (selection.isEmpty) {
+    return showMessage(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].NO_LAYER_SELECTED);
+  } // duplicate selected layers and group them
+
+
+  var duplicateSelection = getDuplicateSelection(selection);
+  var group = new sketch__WEBPACK_IMPORTED_MODULE_0___default.a.Group({
+    name: name,
+    layers: duplicateSelection,
+    parent: page
+  });
+  group.adjustToFit(); // export group to svg file
+
+  var homeDir = _skpm_os__WEBPACK_IMPORTED_MODULE_2___default.a.homedir();
+  var targetPath = "/Documents/SketchExports";
+  var targetDesc = "".concat(homeDir).concat(targetPath, "/").concat(name, ".svg");
+  sketch__WEBPACK_IMPORTED_MODULE_0___default.a.export(group, {
+    formats: "svg",
+    output: "~/Documents/SketchExports"
+  }); // remove the group after we exported it to svg, otherwise it still shows in the sketch file
+
+  group.remove();
+  return targetDesc;
+};
 
 /***/ }),
 
@@ -1702,8 +1702,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MESSAGES", function() { return MESSAGES; });
 var MESSAGES = {
   NO_LAYER_SELECTED: "Please select a layer!",
-  READ_FILE_ERROR: "Read svg file failed, please check if you have a svg file under you ~/Documents/Sketch Exports!",
-  COPY_TO_CLIPBOARD_SUCCESS: "Svg has copied successfully to you clipboard!"
+  GENERAL_ERROR: "Read svg file failed, please check if you have a svg file under you ~/Documents/Sketch Exports!",
+  COPY_TO_CLIPBOARD_SUCCESS: "Svg has copied successfully to you clipboard!",
+  COPY_TO_CLIPBOARD_FAILED: "Svg copy failed!",
+  COMPRESSING: "Compressing..."
 };
 
 /***/ }),
@@ -1728,4 +1730,4 @@ module.exports = require("sketch");
 }
 that['onRun'] = __skpm_run.bind(this, 'default')
 
-//# sourceMappingURL=copy-svg-as-tsx.js.map
+//# sourceMappingURL=copy-svg-as-rn-component.js.map

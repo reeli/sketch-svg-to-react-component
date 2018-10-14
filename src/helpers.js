@@ -1,4 +1,8 @@
 import sketch from "sketch";
+import {MESSAGES} from "./messages";
+import os from "@skpm/os";
+
+const {execSync} = require('@skpm/child_process');
 
 export const showMessage = (str) => {
     sketch.UI.message(str);
@@ -28,4 +32,53 @@ export const createWrapper = (svgString) => {
         ${svgString}
     )
     `;
+};
+
+export function transformSvgToReactComponent(svgPath, svgrPath) {
+    return execSync(`${svgrPath} "${svgPath}"`);
+}
+
+export function transformSvgToRNComponent(svgPath, svgrPath) {
+    return execSync(`${svgrPath} --native "${svgPath}"`);
+}
+
+export const getSvgrPathByContext = (context) => {
+    return context.plugin
+        .urlForResourceNamed('node_modules/@svgr/cli/bin/svgr')
+        .path();
+};
+
+export const exportSelectedLayersAsSvg = () => {
+    const name = "sketch-selected-svg";
+    const document = sketch.Document.getSelectedDocument();
+    const page = document.selectedPage;
+
+    // get selected layers
+    const selection = document.selectedLayers;
+    if (selection.isEmpty) {
+        return showMessage(MESSAGES.NO_LAYER_SELECTED);
+    }
+
+    // duplicate selected layers and group them
+    const duplicateSelection = getDuplicateSelection(selection);
+    const group = new sketch.Group({
+        name,
+        layers: duplicateSelection,
+        parent: page
+    });
+
+    group.adjustToFit();
+
+    // export group to svg file
+    const homeDir = os.homedir();
+    const targetPath = "/Documents/SketchExports";
+    const targetDesc = `${homeDir}${targetPath}/${name}.svg`;
+    sketch.export(group, {
+        formats: "svg",
+        output: `~/Documents/SketchExports`,
+    });
+
+    // remove the group after we exported it to svg, otherwise it still shows in the sketch file
+    group.remove();
+    return targetDesc;
 };
