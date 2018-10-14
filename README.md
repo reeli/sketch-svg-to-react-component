@@ -11,3 +11,8 @@ Upcoming soon:
 - Export multiple svg as RN Component
 - Simplify svg
 
+
+Todo:
+
+- format copied string by prettier
+- reduce packages size by using like sketch/dom sketch/UI

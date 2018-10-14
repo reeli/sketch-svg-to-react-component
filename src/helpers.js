@@ -3,6 +3,7 @@ import {MESSAGES} from "./messages";
 import os from "@skpm/os";
 
 const {execSync} = require('@skpm/child_process');
+const toArray = require('sketch-utils/to-array');
 
 export const showMessage = (str) => {
     sketch.UI.message(str);
@@ -40,6 +41,10 @@ export function transformSvgToReactComponent(svgPath, svgrPath) {
 
 export function transformSvgToRNComponent(svgPath, svgrPath) {
     return execSync(`${svgrPath} --native "${svgPath}"`);
+}
+
+export function transformSvgsToReactComponent(svgPaths, svgrPath, dirname) {
+    return execSync(`${svgrPath} --ext=tsx --out-dir=${dirname}` + " " + `"${svgPaths.join('" "')}"`);
 }
 
 export const getSvgrPathByContext = (context) => {
@@ -81,4 +86,17 @@ export const exportSelectedLayersAsSvg = () => {
     // remove the group after we exported it to svg, otherwise it still shows in the sketch file
     group.remove();
     return targetDesc;
+};
+
+export const getExportedSvgPathsByContext = (context) => {
+    const exportRequests = toArray(context.actionContext.exports);
+
+    return exportRequests
+        .filter(currentExport => {
+            // can not use "===" here, case the type of "currentExport.request.format()" is object
+            return currentExport.request.format() == "svg";
+        })
+        .map(currentExport => {
+            return currentExport.path;
+        });
 };

@@ -1569,6 +1569,27 @@ addStructToBridgeSupport('objc_super', { type: objc_super_typeEncoding });
 
 /***/ }),
 
+/***/ "./node_modules/sketch-utils/to-array.js":
+/*!***********************************************!*\
+  !*** ./node_modules/sketch-utils/to-array.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function toArray(object) {
+  if (Array.isArray(object)) {
+    return object
+  }
+  var arr = []
+  for (var j = 0; j < (object || []).length; j += 1) {
+    arr.push(object[j])
+  }
+  return arr
+}
+
+
+/***/ }),
+
 /***/ "./src/copy-svg-as-react-component.js":
 /*!********************************************!*\
   !*** ./src/copy-svg-as-react-component.js ***!
@@ -1602,7 +1623,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!************************!*\
   !*** ./src/helpers.js ***!
   \************************/
-/*! exports provided: showMessage, getDuplicateSelection, copyStrToClipboard, createWrapper, transformSvgToReactComponent, transformSvgToRNComponent, getSvgrPathByContext, exportSelectedLayersAsSvg */
+/*! exports provided: showMessage, getDuplicateSelection, copyStrToClipboard, createWrapper, transformSvgToReactComponent, transformSvgToRNComponent, transformSvgsToReactComponent, getSvgrPathByContext, exportSelectedLayersAsSvg, getExportedSvgPathsByContext */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1613,8 +1634,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createWrapper", function() { return createWrapper; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transformSvgToReactComponent", function() { return transformSvgToReactComponent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transformSvgToRNComponent", function() { return transformSvgToRNComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transformSvgsToReactComponent", function() { return transformSvgsToReactComponent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getSvgrPathByContext", function() { return getSvgrPathByContext; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "exportSelectedLayersAsSvg", function() { return exportSelectedLayersAsSvg; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getExportedSvgPathsByContext", function() { return getExportedSvgPathsByContext; });
 /* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sketch */ "sketch");
 /* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sketch__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./messages */ "./src/messages.js");
@@ -1626,6 +1649,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var _require = __webpack_require__(/*! @skpm/child_process */ "./node_modules/@skpm/child_process/index.js"),
     execSync = _require.execSync;
+
+var toArray = __webpack_require__(/*! sketch-utils/to-array */ "./node_modules/sketch-utils/to-array.js");
 
 var showMessage = function showMessage(str) {
   sketch__WEBPACK_IMPORTED_MODULE_0___default.a.UI.message(str);
@@ -1652,6 +1677,9 @@ function transformSvgToReactComponent(svgPath, svgrPath) {
 }
 function transformSvgToRNComponent(svgPath, svgrPath) {
   return execSync("".concat(svgrPath, " --native \"").concat(svgPath, "\""));
+}
+function transformSvgsToReactComponent(svgPaths, svgrPath, dirname) {
+  return execSync("".concat(svgrPath, " --ext=tsx --out-dir=").concat(dirname) + " " + "\"".concat(svgPaths.join('" "'), "\""));
 }
 var getSvgrPathByContext = function getSvgrPathByContext(context) {
   return context.plugin.urlForResourceNamed('node_modules/@svgr/cli/bin/svgr').path();
@@ -1687,6 +1715,15 @@ var exportSelectedLayersAsSvg = function exportSelectedLayersAsSvg() {
   group.remove();
   return targetDesc;
 };
+var getExportedSvgPathsByContext = function getExportedSvgPathsByContext(context) {
+  var exportRequests = toArray(context.actionContext.exports);
+  return exportRequests.filter(function (currentExport) {
+    // can not use "===" here, case the type of "currentExport.request.format()" is object
+    return currentExport.request.format() == "svg";
+  }).map(function (currentExport) {
+    return currentExport.path;
+  });
+};
 
 /***/ }),
 
@@ -1702,10 +1739,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MESSAGES", function() { return MESSAGES; });
 var MESSAGES = {
   NO_LAYER_SELECTED: "Please select a layer!",
-  GENERAL_ERROR: "Read svg file failed, please check if you have a svg file under you ~/Documents/Sketch Exports!",
-  COPY_TO_CLIPBOARD_SUCCESS: "Svg has copied successfully to you clipboard!",
-  COPY_TO_CLIPBOARD_FAILED: "Svg copy failed!",
-  COMPRESSING: "Compressing..."
+  GENERAL_ERROR: "Something went wrong!",
+  COPY_TO_CLIPBOARD_SUCCESS: "Copy svg to clipboard successfully!",
+  COPY_TO_CLIPBOARD_FAILED: "Copy svg to clipboard failed!",
+  COMPRESSING: "Compressing...",
+  EXPORT_SUCCESS: "Export successfully!",
+  EXPORT_FAILED: "Export failed!"
 };
 
 /***/ }),
