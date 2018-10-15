@@ -15,9 +15,7 @@ export function onExportSlices(context) {
     }
 
     const dirname = path.dirname(svgPaths[0]);
-    log(`${getSvgrPathByContext(context)} --ext=tsx --out-dir=${dirname}` + " " + `"${svgPaths.join('" "')}"`);
-
-    showMessage(MESSAGES.COMPRESSING);
+    showMessage(MESSAGES.TRANSFORMING);
 
     const result = transformSvgsToReactComponent(svgPaths, getSvgrPathByContext(context), dirname);
     result

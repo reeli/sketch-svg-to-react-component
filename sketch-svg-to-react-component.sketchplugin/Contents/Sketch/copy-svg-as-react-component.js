@@ -1607,7 +1607,7 @@ __webpack_require__.r(__webpack_exports__);
   try {
     // export selected layers as svg
     var targetDesc = Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["exportSelectedLayersAsSvg"])();
-    Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].COMPRESSING);
+    Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["showMessage"])(_messages__WEBPACK_IMPORTED_MODULE_1__["MESSAGES"].TRANSFORMING);
     var result = Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["transformSvgToReactComponent"])(targetDesc, Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["getSvgrPathByContext"])(context)); // copy result to clipboard
 
     Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["copyStrToClipboard"])(result);
@@ -1742,7 +1742,7 @@ var MESSAGES = {
   GENERAL_ERROR: "Something went wrong!",
   COPY_TO_CLIPBOARD_SUCCESS: "Copy svg to clipboard successfully!",
   COPY_TO_CLIPBOARD_FAILED: "Copy svg to clipboard failed!",
-  COMPRESSING: "Compressing...",
+  TRANSFORMING: "Transforming...",
   EXPORT_SUCCESS: "Export successfully!",
   EXPORT_FAILED: "Export failed!",
   NO_SVG_EXPORTED: "No svg exported!"

@@ -1,4 +1,6 @@
-# sketch-svg-to-react-component-in-typescript
+# sketch-svg-to-react-component
+
+The sketch plugin which can transform svg to react or react native svg component. 
 
 # Usage
 
@@ -18,3 +20,4 @@ Todo:
 - reduce packages size by using like sketch/dom sketch/UI
 - remove specific characters in filename like @2x, otherwise will cause error
 - export simplify svgs
+- add outline for svg

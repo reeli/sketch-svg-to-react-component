@@ -11,7 +11,7 @@ export default function (context) {
     try {
         // export selected layers as svg
         const targetDesc = exportSelectedLayersAsSvg();
-        showMessage(MESSAGES.COMPRESSING);
+        showMessage(MESSAGES.TRANSFORMING);
         const result = transformSvgToReactComponent(targetDesc, getSvgrPathByContext(context));
 
         // copy result to clipboard
