@@ -21,3 +21,4 @@ Todo:
 - remove specific characters in filename like @2x, otherwise will cause error
 - export simplify svgs
 - add outline for svg
+- export react components with customized template
