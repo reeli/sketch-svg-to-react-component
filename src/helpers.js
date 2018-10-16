@@ -1,4 +1,5 @@
-import sketch from "sketch";
+import sketch, {Document, Group} from "sketch/dom";
+import UI from 'sketch/ui';
 import {MESSAGES} from "./messages";
 import os from "@skpm/os";
 
@@ -6,7 +7,7 @@ const {execSync} = require('@skpm/child_process');
 const toArray = require('sketch-utils/to-array');
 
 export const showMessage = (str) => {
-    sketch.UI.message(str);
+    UI.message(str);
 };
 
 export const getDuplicateSelection = (selection) => {
@@ -22,7 +23,6 @@ export const copyStrToClipboard = (str) => {
     const pasteboard = NSPasteboard.generalPasteboard();
     pasteboard.clearContents();
     pasteboard.writeObjects([`${str}`]);
-    sketch.UI.message([str]);
 };
 
 export const createWrapper = (svgString) => {
@@ -36,21 +36,15 @@ export const createWrapper = (svgString) => {
 };
 
 export function transformSvgToReactComponent(svgPath, svgrPath) {
-    return execSync(`${svgrPath} "${svgPath}"`, {
-        maxBuffer: 50000 * 1024,
-    });
+    return execSync(`${svgrPath} "${svgPath}"`);
 }
 
 export function transformSvgToRNComponent(svgPath, svgrPath) {
-    return execSync(`${svgrPath} --native "${svgPath}"`, {
-        maxBuffer: 50000 * 1024,
-    });
+    return execSync(`${svgrPath} --native "${svgPath}"`);
 }
 
 export function transformSvgsToReactComponent(svgPaths, svgrPath, targetDesc) {
-    return execSync(`${svgrPath} --ext=tsx --out-dir=${targetDesc}` + " " + `"${svgPaths.join('" "')}"`, {
-        maxBuffer: 50000 * 1024,
-    });
+    return execSync(`${svgrPath} --ext=tsx --out-dir=${targetDesc}` + " " + `"${svgPaths.join('" "')}"`);
 }
 
 export const getSvgrPathByContext = (context) => {
@@ -61,7 +55,7 @@ export const getSvgrPathByContext = (context) => {
 
 export const exportSelectedLayersAsSvg = () => {
     const name = "sketch-selected-svg";
-    const document = sketch.Document.getSelectedDocument();
+    const document = Document.getSelectedDocument();
     const page = document.selectedPage;
 
     // get selected layers
@@ -72,7 +66,7 @@ export const exportSelectedLayersAsSvg = () => {
 
     // duplicate selected layers and group them
     const duplicateSelection = getDuplicateSelection(selection);
-    const group = new sketch.Group({
+    const group = new Group({
         name,
         layers: duplicateSelection,
         parent: page
