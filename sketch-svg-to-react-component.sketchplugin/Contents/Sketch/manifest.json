@@ -34,7 +34,7 @@
       "export-svg-with-react-component"
     ]
   },
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Sketch plugin to compress SVG and transform it to React (include React Native) components. By copy React component directly to you clipboard or export as files.",
   "name": "SVG to React Component",
   "identifier": "SVG to React Component",
