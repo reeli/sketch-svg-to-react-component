@@ -1,6 +1,0 @@
-{
-  "name": "sketch-svg-to-react-component-in-typescript-assets",
-  "dependencies": {
-    "@svgr/cli": "^3.1.0"
-  }
-}

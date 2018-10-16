@@ -1,7 +1,5 @@
 # build artifacts
-
-plugin.sketchplugin
-sketch-svg-to-react-component.sketchplugin
+sketch-svg-to-react-component.sketchplugin/**/*
 
 # npm
 node_modules
