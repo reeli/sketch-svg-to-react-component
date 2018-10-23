@@ -36,15 +36,15 @@ export const createWrapper = (svgString) => {
 };
 
 export function transformSvgToReactComponent(svgPath, svgrPath) {
-    return execSync(`${svgrPath} "${svgPath}"`);
+    return execSync(`"${svgrPath}" "${svgPath}"`);
 }
 
 export function transformSvgToRNComponent(svgPath, svgrPath) {
-    return execSync(`${svgrPath} --native "${svgPath}"`);
+    return execSync(`"${svgrPath}" --native "${svgPath}"`);
 }
 
 export function transformSvgsToReactComponent(svgPaths, svgrPath, targetDesc) {
-    return execSync(`${svgrPath} --ext=tsx --out-dir=${targetDesc}` + " " + `"${svgPaths.join('" "')}"`);
+    return execSync(`"${svgrPath}" --ext=tsx --out-dir="${targetDesc}"` + " " + `"${svgPaths.join('" "')}"`);
 }
 
 export const getSvgrPathByContext = (context) => {
