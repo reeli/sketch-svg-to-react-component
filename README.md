@@ -22,3 +22,7 @@ The sketch plugin which can transform svg to react or react native svg component
 - export simplify svgs
 - add outline for svg
 - export react components with customized template
+
+## Publish
+
+- rm assets/node_modules before publish
